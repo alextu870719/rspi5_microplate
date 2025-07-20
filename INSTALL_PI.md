@@ -1,100 +1,100 @@
-# Raspberry Pi 5 安裝指南
+# Raspberry Pi 5 Installation Guide
 
-本指南將協助你在Raspberry Pi 5上安裝並運行Microplate Light Guide應用程式。
+This guide will help you install and run the Microplate Light Guide application on Raspberry Pi 5.
 
-## 🚀 一鍵自動安裝
+## 🚀 One-Click Automated Installation
 
-### 方法1: 完整自動安裝（推薦）
+### Method 1: Complete Automated Installation (Recommended)
 ```bash
 curl -sSL https://raw.githubusercontent.com/alextu870719/rspi5_microplate/main/install.sh | bash
 ```
 
-這個腳本會自動：
-- 更新系統
-- 安裝所有必要套件
-- 下載專案
-- 設定觸控螢幕
-- 設定開機自動啟動
-- 創建桌面捷徑
+This script will automatically:
+- Update the system
+- Install all necessary packages
+- Download the project
+- Configure touchscreen
+- Set up auto-startup
+- Create desktop shortcuts
 
-### 方法2: 快速安裝（適合已有基本環境）
+### Method 2: Quick Installation (For existing basic environments)
 ```bash
 curl -sSL https://raw.githubusercontent.com/alextu870719/rspi5_microplate/main/quick_install.sh | bash
 ```
 
-## 📋 系統需求
+## 📋 System Requirements
 
-### 硬體需求
-- Raspberry Pi 5 (推薦) 或 Pi 4
-- 7吋官方觸控螢幕 (800×480)
-- MicroSD卡 (至少16GB，推薦32GB)
-- USB序列埠轉換器（用於硬體通訊）
+### Hardware Requirements
+- Raspberry Pi 5 (recommended) or Pi 4
+- 7-inch official touchscreen (800×480)
+- MicroSD card (minimum 16GB, recommended 32GB)
+- USB serial converters (for hardware communication)
 
-### 軟體需求
-- Raspberry Pi OS (Bullseye或更新版本)
+### Software Requirements
+- Raspberry Pi OS (Bullseye or newer)
 - Python 3.7+
-- X11桌面環境
+- X11 desktop environment
 
-## 🛠️ 手動安裝步驟
+## 🛠️ Manual Installation Steps
 
-如果自動安裝失敗，可以手動執行以下步驟：
+If automatic installation fails, you can manually execute the following steps:
 
-### 1. 更新系統
+### 1. Update System
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-### 2. 安裝Python依賴
+### 2. Install Python Dependencies
 ```bash
 sudo apt install -y python3-pyqt5 python3-pandas python3-serial python3-pip git
 ```
 
-### 3. 下載專案
+### 3. Download Project
 ```bash
 cd ~
 git clone https://github.com/alextu870719/rspi5_microplate.git
 cd rspi5_microplate
 ```
 
-### 4. 安裝額外依賴
+### 4. Install Additional Dependencies
 ```bash
 pip3 install --user -r requirements.txt
 ```
 
-### 5. 測試運行
+### 5. Test Run
 ```bash
 python3 main.py
 ```
 
-## ⚙️ 觸控螢幕設定
+## ⚙️ Touchscreen Configuration
 
-### 啟用7吋觸控螢幕
-編輯 `/boot/config.txt`:
+### Enable 7-inch Touchscreen
+Edit `/boot/config.txt`:
 ```bash
 sudo nano /boot/config.txt
 ```
 
-添加以下行：
+Add the following lines:
 ```
 # 7-inch touchscreen support
 dtoverlay=rpi-ft5406
 dtoverlay=rpi-backlight
 ```
 
-### 校準觸控（如果需要）
+### Calibrate Touch (if needed)
 ```bash
 xinput_calibrator
 ```
 
-## 🔧 開機自動啟動
+## 🔧 Auto-startup Configuration
 
-### 使用systemd服務（推薦）
-創建服務檔案：
+### Using systemd Service (Recommended)
+Create service file:
 ```bash
 sudo nano /etc/systemd/system/microplate.service
 ```
 
-內容：
+Content:
 ```ini
 [Unit]
 Description=Microplate Light Guide
@@ -112,19 +112,19 @@ Restart=always
 WantedBy=graphical-session.target
 ```
 
-啟用服務：
+Enable service:
 ```bash
 sudo systemctl enable microplate.service
 sudo systemctl start microplate.service
 ```
 
-### 使用autostart（替代方法）
+### Using autostart (Alternative method)
 ```bash
 mkdir -p ~/.config/autostart
 nano ~/.config/autostart/microplate.desktop
 ```
 
-內容：
+Content:
 ```ini
 [Desktop Entry]
 Type=Application
@@ -134,93 +134,114 @@ Hidden=false
 X-GNOME-Autostart-enabled=true
 ```
 
-## 📁 專案結構
+## 📁 Project Structure
 
 ```
 rspi5_microplate/
-├── main.py                    # 主程式
-├── Input_CSV/                 # CSV範例檔案
-│   ├── test.csv
-│   ├── 384DNA.csv
-│   └── ...
-├── install.sh                 # 完整安裝腳本
-├── quick_install.sh           # 快速安裝腳本
-├── run_microplate.sh          # 快速啟動腳本
-└── requirements.txt           # Python依賴
+├── main.py                       # Main application
+├── Input_CSV/                    # CSV sample files
+│   ├── Step_Source_Destination.csv  # Complete step format
+│   ├── Step_Source.csv              # Source-only format
+│   └── README.md                    # CSV documentation
+├── install.sh                    # Complete installation script
+├── quick_install.sh              # Quick installation script  
+├── run_microplate.sh             # Quick launch script
+├── INSTALL_PI.md                 # This installation guide
+└── requirements.txt              # Python dependencies
 ```
 
-## 🎯 使用方式
+## 🎯 Usage Instructions
 
-### 基本操作
-1. 點擊「Load CSV」載入協議檔案
-2. 使用孔板類型按鈕切換格式（384→96→48→24）
-3. 使用「Next/Previous」導航步驟
-4. 使用「All Light」功能測試所有孔位
+### Basic Operations
+1. Click "Load CSV" to load protocol files
+2. Use plate type button to switch formats (384→96→48→24)
+3. Use "Next/Previous" to navigate steps
+4. Use "All Light" function to test all wells
 
-### CSV檔案格式
-範例檔案在 `Input_CSV/` 資料夾中：
-- `test.csv` - 基本測試
-- `384DNA.csv` - 384孔板實驗
-- `multi_wells.csv` - 多孔位操作
+### CSV File Formats
+Sample files in the `Input_CSV/` folder:
+- `Step_Source_Destination.csv` - Complete step format with source and destination
+- `Step_Source.csv` - Source-only format for detection/sampling operations
 
-## 🔍 故障排除
+### Supported CSV Formats
+1. **Complete Step Format** (Recommended):
+   ```csv
+   Step,Source,Destination
+   1,A1,B1
+   2,A2,B2
+   ```
 
-### 程式無法啟動
+2. **Source-Only Step Format**:
+   ```csv
+   Step,Source
+   1,A1
+   2,B1
+   ```
+
+## 🔍 Troubleshooting
+
+### Application Won't Start
 ```bash
-# 檢查Python依賴
+# Check Python dependencies
 python3 -c "import PyQt5; print('PyQt5 OK')"
 python3 -c "import pandas; print('pandas OK')"
 python3 -c "import serial; print('serial OK')"
 ```
 
-### 觸控不響應
+### Touch Not Responding
 ```bash
-# 檢查觸控設備
+# Check touch devices
 xinput list
-# 重新校準
+# Recalibrate
 xinput_calibrator
 ```
 
-### 串列埠問題
+### Serial Port Issues
 ```bash
-# 檢查串列埠
+# Check serial ports
 ls /dev/ttyUSB*
 ls /dev/ttyACM*
-# 設定權限
+# Set permissions
 sudo usermod -a -G dialout $USER
 ```
 
-### 檢查服務狀態
+### Check Service Status
 ```bash
 sudo systemctl status microplate
 sudo journalctl -u microplate -f
 ```
 
-## 🛡️ 生產環境設定
+## 🛡️ Production Environment Setup
 
-### 1. 關閉開發模式
-編輯 `main.py`：
+### 1. Disable Development Mode
+Edit `main.py`:
 ```python
-DEV_MODE = False  # 啟用實際硬體通訊
+DEV_MODE = False  # Enable actual hardware communication
 ```
 
-### 2. 設定串列埠
+### 2. Configure Serial Ports
 ```python
-SERIAL_PORT_SOURCE = '/dev/ttyUSB0'  # 根據實際設備調整
+SERIAL_PORT_SOURCE = '/dev/ttyUSB0'  # Adjust according to actual devices
 SERIAL_PORT_DEST = '/dev/ttyUSB1'
 ```
 
-### 3. 設定看門狗（可選）
+### 3. Configure Watchdog (Optional)
 ```bash
 sudo apt install watchdog
 sudo systemctl enable watchdog
 ```
 
-## 📞 支援
+## 📞 Support
 
-如果遇到問題，請檢查：
-1. 硬體連接是否正確
-2. 系統日誌：`sudo journalctl -xe`
-3. 程式日誌：`sudo journalctl -u microplate -f`
+If you encounter problems, please check:
+1. Hardware connections are correct
+2. System logs: `sudo journalctl -xe`
+3. Application logs: `sudo journalctl -u microplate -f`
 
-更多資訊請參考主要README.md檔案。
+For more information, please refer to the main README.md file.
+
+## 📚 Additional Resources
+
+- **Main Documentation**: See the project's main README.md
+- **CSV Format Guide**: Check Input_CSV/README.md for detailed CSV format specifications
+- **GitHub Repository**: [https://github.com/alextu870719/rspi5_microplate](https://github.com/alextu870719/rspi5_microplate)
