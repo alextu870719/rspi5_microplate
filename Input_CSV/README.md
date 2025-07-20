@@ -1,14 +1,14 @@
 # CSV Input Files
 
-這個資料夾包含了微孔板應用程式的範例CSV檔案。
+This folder contains sample CSV files for the microplate application.
 
-## 檔案說明
+## File Descriptions
 
 ### 📄 **Step_Source_Destination.csv**
-- **描述**: 標準步驟格式完整範例
-- **格式**: Step, Source, Destination完整格式
-- **用途**: 展示標準三欄位CSV格式，包含明確的來源和目標孔位定義
-- **範例內容**:
+- **Description**: Complete step format example with source and destination
+- **Format**: Step, Source, Destination three-column format
+- **Purpose**: Demonstrates standard three-column CSV format with explicit source and destination well definitions
+- **Sample Content**:
   ```csv
   Step,Source,Destination
   1,A1,B1
@@ -21,10 +21,10 @@
   ```
 
 ### 📄 **Step_Source.csv**  
-- **描述**: 僅來源孔位步驟格式
-- **格式**: Step, Source格式（無目標孔位）
-- **用途**: 只需要標示來源孔位的實驗（例如：檢測、取樣等操作）
-- **範例內容**:
+- **Description**: Source-only step format
+- **Format**: Step, Source format (no destination wells)
+- **Purpose**: For experiments that only require source well identification (e.g., detection, sampling operations)
+- **Sample Content**:
   ```csv
   Step,Source
   1,A1
@@ -38,10 +38,10 @@
   3,C4
   ```
 
-## CSV檔案格式說明
+## CSV File Format Specifications
 
-### 步驟格式 - 完整版 (推薦)
-包含來源和目標孔位的完整操作定義：
+### Step Format - Complete Version (Recommended)
+Contains complete operation definition with source and destination wells:
 ```csv
 Step,Source,Destination
 1,A01,B02
@@ -49,8 +49,8 @@ Step,Source,Destination
 2,E05,F06
 ```
 
-### 步驟格式 - 來源版
-僅定義來源孔位，適用於檢測或取樣操作：
+### Step Format - Source-Only Version
+Only defines source wells, suitable for detection or sampling operations:
 ```csv
 Step,Source
 1,A01
@@ -58,15 +58,15 @@ Step,Source
 2,E05
 ```
 
-## 使用方式
+## Usage Instructions
 
-1. 在應用程式中點擊 "Load CSV" 按鈕
-2. 選擇這個資料夾中的任一CSV檔案
-3. 應用程式會自動識別檔案格式並載入
-4. 使用 Next/Previous 按鈕導航步驟
+1. Click the "Load CSV" button in the application
+2. Select any CSV file from this folder
+3. The application will automatically detect the file format and load it
+4. Use Next/Previous buttons to navigate through steps
 
-## 注意事項
+## Important Notes
 
-- 孔位格式支援 A1, A01 兩種形式
-- 多個孔位可用分號(;)分隔
-- 應用程式會自動標準化孔位格式為 A01 形式
+- Well formats support both A1 and A01 notation
+- Multiple wells can be separated with semicolons (;)
+- The application will automatically standardize well format to A01 form
