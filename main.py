@@ -244,7 +244,8 @@ class MicroplateGUI(QWidget):
             
         # Calculate pixel values
         self.well_diameter_px = int(self.well_diameter_mm * self.mm_to_pixel_x)
-        self.well_spacing_px = int(self.well_spacing_mm * self.mm_to_pixel_x)
+        self.well_spacing_x_px = int(self.well_spacing_mm * self.mm_to_pixel_x)
+        self.well_spacing_y_px = int(self.well_spacing_mm * self.mm_to_pixel_y)
         self.edge_to_first_col_px = int(self.edge_to_first_col_mm * self.mm_to_pixel_x)
         self.edge_to_first_row_px = int(self.edge_to_first_row_mm * self.mm_to_pixel_y)
 
@@ -501,7 +502,7 @@ class MicroplateGUI(QWidget):
             row_label.setFixedSize(15, self.well_diameter_px)
             row_label.setStyleSheet("color: #FFFFFF; background: transparent;")
             row_label.setParent(container)
-            y_pos = first_well_y + r * self.well_spacing_px
+            y_pos = first_well_y + r * self.well_spacing_y_px
             row_label.move(first_well_x - 18, y_pos)
             row_label.show()
         
@@ -521,7 +522,7 @@ class MicroplateGUI(QWidget):
             col_label.setFixedSize(self.well_diameter_px, 12)
             col_label.setStyleSheet("color: #FFFFFF; background: transparent;")
             col_label.setParent(container)
-            x_pos = first_well_x + c * self.well_spacing_px
+            x_pos = first_well_x + c * self.well_spacing_x_px
             col_label.move(x_pos, first_well_y - 15)
             col_label.show()
         
@@ -550,8 +551,8 @@ class MicroplateGUI(QWidget):
                 """)
                 
                 # Calculate precise position (based on edge distance and well spacing)
-                x_pos = first_well_x + c * self.well_spacing_px
-                y_pos = first_well_y + r * self.well_spacing_px
+                x_pos = first_well_x + c * self.well_spacing_x_px
+                y_pos = first_well_y + r * self.well_spacing_y_px
                 
                 btn.move(x_pos, y_pos)
                 btn.show()
