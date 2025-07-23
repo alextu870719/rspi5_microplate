@@ -17,6 +17,9 @@ BAUDRATE = 9600
 class MicroplateGUI(QWidget):
     def __init__(self):
         super().__init__()
+        # Initialize fullscreen state
+        self.is_fullscreen = True
+        
         # Remove window title and make it frameless for fullscreen experience
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setFixedSize(800, 480)  # Designed for 7-inch screen
@@ -114,6 +117,9 @@ class MicroplateGUI(QWidget):
         # Add plate selection button (single button that cycles through formats)
         self.btn_plate_type = QPushButton("384-Well")
         
+        # Add fullscreen toggle button
+        self.btn_fullscreen = QPushButton("Windowed")
+        
         self.btn_select = QPushButton("Load CSV")
         self.btn_prev = QPushButton("Previous")
         self.btn_next = QPushButton("Next")
@@ -145,18 +151,21 @@ class MicroplateGUI(QWidget):
         """
         
         self.btn_plate_type.setStyleSheet(self.get_button_style(True))   # Plate type button
+        self.btn_fullscreen.setStyleSheet(self.get_button_style(False)) # Fullscreen toggle button
         self.btn_select.setStyleSheet(self.get_button_style(False))
         self.btn_prev.setStyleSheet(self.get_button_style(False))
         self.btn_next.setStyleSheet(self.get_button_style(False))
         self.btn_all_light.setStyleSheet(self.get_button_style(False))
         
         self.btn_plate_type.clicked.connect(self.cycle_plate_type)
+        self.btn_fullscreen.clicked.connect(self.toggle_fullscreen)
         self.btn_select.clicked.connect(self.load_csv)
         self.btn_prev.clicked.connect(self.go_prev)
         self.btn_next.clicked.connect(self.go_next)
         self.btn_all_light.clicked.connect(self.toggle_all_light)
         
         left_panel.addWidget(self.btn_plate_type)
+        left_panel.addWidget(self.btn_fullscreen)
         left_panel.addWidget(self.btn_select)
         left_panel.addWidget(self.btn_prev)
         left_panel.addWidget(self.btn_next)
@@ -304,6 +313,35 @@ class MicroplateGUI(QWidget):
                     background-color: #3d8b40;
                 }
             """
+
+    def toggle_fullscreen(self):
+        """Toggle between fullscreen and windowed mode"""
+        if self.is_fullscreen:
+            # Switch to windowed mode
+            self.setWindowFlags(Qt.Window)  # Normal window with title bar
+            self.setFixedSize(1000, 600)  # Larger windowed size
+            self.btn_fullscreen.setText("Fullscreen")
+            self.is_fullscreen = False
+        else:
+            # Switch to fullscreen mode
+            self.setWindowFlags(Qt.FramelessWindowHint)  # Remove title bar
+            self.setFixedSize(800, 480)  # Original screen size
+            self.btn_fullscreen.setText("Windowed")
+            self.is_fullscreen = True
+        
+        # Show the window with new settings
+        self.show()
+        
+        # Redraw the plate to adapt to new window size if needed
+        self.draw_plate()
+
+    def keyPressEvent(self, event):
+        """Handle key press events"""
+        # F11 key toggles fullscreen mode
+        if event.key() == Qt.Key_F11:
+            self.toggle_fullscreen()
+        else:
+            super().keyPressEvent(event)
 
     def load_csv(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "", "CSV Files (*.csv)")
