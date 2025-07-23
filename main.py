@@ -22,7 +22,6 @@ class MicroplateGUI(QWidget):
         
         # Remove window title and make it frameless for fullscreen experience
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setFixedSize(800, 480)  # Designed for 7-inch screen
         
         # Set black background for the entire application
         self.setStyleSheet("""
@@ -50,6 +49,10 @@ class MicroplateGUI(QWidget):
         self.plate_width_mm = 127.76
         self.plate_height_mm = 85.48
         
+        # Default screen resolution for calculations (will be updated dynamically)
+        self.default_screen_width = 800
+        self.default_screen_height = 480
+        
         # 96-well specifications
         self.well_96_diameter_mm = 7.0
         self.well_96_spacing_mm = 9.0
@@ -74,9 +77,8 @@ class MicroplateGUI(QWidget):
         self.edge_384_to_first_col_mm = 12.12  # Left edge to column 1 center
         self.edge_384_to_first_row_mm = 8.99   # Top edge to row 1 center
         
-        # Convert to pixels (800×480) - 1:1 real size
-        self.mm_to_pixel_x = 800 / self.screen_width_mm
-        self.mm_to_pixel_y = 480 / self.screen_height_mm
+        # Convert to pixels - will be updated dynamically based on current window size
+        self.update_pixel_conversion()
         
         # Calculate actual plate size (127.76mm × 85.48mm)
         self.plate_outline_width_px = int(self.plate_width_mm * self.mm_to_pixel_x)
@@ -200,6 +202,20 @@ class MicroplateGUI(QWidget):
         # Initialize with empty 384-well plate
         self.draw_plate()
 
+    def update_pixel_conversion(self):
+        """Update pixel conversion ratios based on current window size"""
+        current_width = self.width() if hasattr(self, 'width') and self.width() > 0 else self.default_screen_width
+        current_height = self.height() if hasattr(self, 'height') and self.height() > 0 else self.default_screen_height
+        
+        # For fullscreen, use the actual physical screen mapping
+        if self.is_fullscreen:
+            self.mm_to_pixel_x = self.default_screen_width / self.screen_width_mm
+            self.mm_to_pixel_y = self.default_screen_height / self.screen_height_mm
+        else:
+            # For windowed mode, scale proportionally
+            self.mm_to_pixel_x = current_width / self.screen_width_mm
+            self.mm_to_pixel_y = current_height / self.screen_height_mm
+
     def update_plate_parameters(self):
         """Update parameters based on current plate type"""
         if self.plate_type == "96":
@@ -315,24 +331,34 @@ class MicroplateGUI(QWidget):
             """
 
     def toggle_fullscreen(self):
-        """Toggle between fullscreen and windowed mode"""
+        """Toggle between fullscreen and windowed mode using Qt5's showFullScreen()"""
         if self.is_fullscreen:
             # Switch to windowed mode
+            self.showNormal()  # Exit fullscreen mode
             self.setWindowFlags(Qt.Window)  # Normal window with title bar
             self.setFixedSize(1000, 600)  # Larger windowed size
             self.btn_fullscreen.setText("Fullscreen")
             self.is_fullscreen = False
+            self.show()  # Show with new window flags
         else:
             # Switch to fullscreen mode
-            self.setWindowFlags(Qt.FramelessWindowHint)  # Remove title bar
-            self.setFixedSize(800, 480)  # Original screen size
+            self.setWindowFlags(Qt.FramelessWindowHint)  # Remove title bar for true fullscreen
+            self.show()  # Apply window flags first
+            self.showFullScreen()  # Use Qt5's built-in fullscreen method
             self.btn_fullscreen.setText("Windowed")
             self.is_fullscreen = True
         
-        # Show the window with new settings
-        self.show()
+        # Update pixel conversion for new window size
+        self.update_pixel_conversion()
         
-        # Redraw the plate to adapt to new window size if needed
+        # Recalculate plate dimensions
+        self.plate_outline_width_px = int(self.plate_width_mm * self.mm_to_pixel_x)
+        self.plate_outline_height_px = int(self.plate_height_mm * self.mm_to_pixel_y)
+        self.plate_width_px = self.plate_outline_width_px
+        self.plate_height_px = self.plate_outline_height_px
+        
+        # Update plate parameters and redraw
+        self.update_plate_parameters()
         self.draw_plate()
 
     def keyPressEvent(self, event):
@@ -804,5 +830,5 @@ class MicroplateGUI(QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MicroplateGUI()
-    window.show()
+    window.showFullScreen()  # Use Qt5's built-in fullscreen method
     sys.exit(app.exec_())
