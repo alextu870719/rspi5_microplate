@@ -17,8 +17,6 @@ BAUDRATE = 9600
 class MicroplateGUI(QWidget):
     def __init__(self):
         super().__init__()
-        # Initialize fullscreen state
-        self.is_fullscreen = True
         
         # Remove window title and make it frameless for fullscreen experience
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -119,9 +117,6 @@ class MicroplateGUI(QWidget):
         # Add plate selection button (single button that cycles through formats)
         self.btn_plate_type = QPushButton("384-Well")
         
-        # Add fullscreen toggle button
-        self.btn_fullscreen = QPushButton("Windowed")
-        
         self.btn_select = QPushButton("Load CSV")
         self.btn_prev = QPushButton("Previous")
         self.btn_next = QPushButton("Next")
@@ -153,21 +148,18 @@ class MicroplateGUI(QWidget):
         """
         
         self.btn_plate_type.setStyleSheet(self.get_button_style(True))   # Plate type button
-        self.btn_fullscreen.setStyleSheet(self.get_button_style(False)) # Fullscreen toggle button
         self.btn_select.setStyleSheet(self.get_button_style(False))
         self.btn_prev.setStyleSheet(self.get_button_style(False))
         self.btn_next.setStyleSheet(self.get_button_style(False))
         self.btn_all_light.setStyleSheet(self.get_button_style(False))
         
         self.btn_plate_type.clicked.connect(self.cycle_plate_type)
-        self.btn_fullscreen.clicked.connect(self.toggle_fullscreen)
         self.btn_select.clicked.connect(self.load_csv)
         self.btn_prev.clicked.connect(self.go_prev)
         self.btn_next.clicked.connect(self.go_next)
         self.btn_all_light.clicked.connect(self.toggle_all_light)
         
         left_panel.addWidget(self.btn_plate_type)
-        left_panel.addWidget(self.btn_fullscreen)
         left_panel.addWidget(self.btn_select)
         left_panel.addWidget(self.btn_prev)
         left_panel.addWidget(self.btn_next)
@@ -199,17 +191,9 @@ class MicroplateGUI(QWidget):
 
     def update_pixel_conversion(self):
         """Update pixel conversion ratios based on current window size"""
-        current_width = self.width() if hasattr(self, 'width') and self.width() > 0 else self.default_screen_width
-        current_height = self.height() if hasattr(self, 'height') and self.height() > 0 else self.default_screen_height
-        
-        # For fullscreen, use the actual physical screen mapping
-        if self.is_fullscreen:
-            self.mm_to_pixel_x = self.default_screen_width / self.screen_width_mm
-            self.mm_to_pixel_y = self.default_screen_height / self.screen_height_mm
-        else:
-            # For windowed mode, scale proportionally
-            self.mm_to_pixel_x = current_width / self.screen_width_mm
-            self.mm_to_pixel_y = current_height / self.screen_height_mm
+        # Always use the actual physical screen mapping for fullscreen
+        self.mm_to_pixel_x = self.default_screen_width / self.screen_width_mm
+        self.mm_to_pixel_y = self.default_screen_height / self.screen_height_mm
 
     def update_plate_parameters(self):
         """Update parameters based on current plate type"""
@@ -325,44 +309,10 @@ class MicroplateGUI(QWidget):
                 }
             """
 
-    def toggle_fullscreen(self):
-        """Toggle between fullscreen and windowed mode using Qt5's showFullScreen()"""
-        if self.is_fullscreen:
-            # Switch to windowed mode
-            self.showNormal()  # Exit fullscreen mode
-            self.setWindowFlags(Qt.Window)  # Normal window with title bar
-            self.setFixedSize(1000, 600)  # Larger windowed size
-            self.btn_fullscreen.setText("Fullscreen")
-            self.is_fullscreen = False
-            self.show()  # Show with new window flags
-        else:
-            # Switch to fullscreen mode
-            self.setWindowFlags(Qt.FramelessWindowHint)  # Remove title bar for true fullscreen
-            self.show()  # Apply window flags first
-            self.showFullScreen()  # Use Qt5's built-in fullscreen method
-            self.btn_fullscreen.setText("Windowed")
-            self.is_fullscreen = True
-        
-        # Update pixel conversion for new window size
-        self.update_pixel_conversion()
-        
-        # Recalculate plate dimensions
-        self.plate_outline_width_px = int(self.plate_width_mm * self.mm_to_pixel_x)
-        self.plate_outline_height_px = int(self.plate_height_mm * self.mm_to_pixel_y)
-        self.plate_width_px = self.plate_outline_width_px
-        self.plate_height_px = self.plate_outline_height_px
-        
-        # Update plate parameters and redraw
-        self.update_plate_parameters()
-        self.draw_plate()
-
     def keyPressEvent(self, event):
         """Handle key press events"""
-        # F11 key toggles fullscreen mode
-        if event.key() == Qt.Key_F11:
-            self.toggle_fullscreen()
-        else:
-            super().keyPressEvent(event)
+        # Pass through to parent for standard key handling
+        super().keyPressEvent(event)
 
     def load_csv(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Select File", "", "CSV Files (*.csv)")
