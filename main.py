@@ -175,11 +175,6 @@ class MicroplateGUI(QWidget):
         
         # Right microplate area
         right_panel = QVBoxLayout()
-        self.plate_label = QLabel("384-Well Microplate")
-        self.plate_label.setAlignment(Qt.AlignCenter)
-        self.plate_label.setFont(QFont("Arial", 10, QFont.Bold))
-        self.plate_label.setStyleSheet("color: #FFFFFF; background: transparent;")
-        right_panel.addWidget(self.plate_label)
         
         # Create microplate container suitable for screen
         plate_container = QWidget()
@@ -263,7 +258,6 @@ class MicroplateGUI(QWidget):
         """Switch plate type"""
         self.plate_type = plate_type
         self.update_plate_parameters()
-        self.plate_label.setText(f"{plate_type}-Well Microplate")
         
         # Update button text to show current plate type
         self.btn_plate_type.setText(f"{plate_type}-Well")
@@ -454,8 +448,7 @@ class MicroplateGUI(QWidget):
         
         # Clear all existing child elements in container (including plate outline, labels, wells)
         for child in container.findChildren(QLabel):
-            if child != self.plate_label:  # Keep main title
-                child.deleteLater()
+            child.deleteLater()
         for child in container.findChildren(QPushButton):
             child.deleteLater()
         
